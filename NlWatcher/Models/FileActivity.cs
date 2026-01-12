@@ -2,9 +2,9 @@
 namespace NlWatcher.Models;
 
 public class FileActivity{
-   Int64 Id {get; set;}
-   String FilePath {get; set;}
-   String FileName {get; set;}
-   String Action {get; set;}
-   DateTime Created{get; set;}
+   public Int64 Id {get; set;}
+   public String FilePath {get; set;}
+   public String FileName {get; set;}
+   public String Action {get; set;}
+   public DateTime Created{get; set;}
 }

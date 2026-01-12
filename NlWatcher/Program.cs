@@ -1,4 +1,5 @@
-﻿
+﻿using NlWatcher.Models;
+
    if (args.Length < 1) {Console.WriteLine("Need path."); return;}
    
    using var watcher = new FileSystemWatcher(args[0]);
@@ -31,6 +32,7 @@ void OnChanged(object sender, FileSystemEventArgs e)
    {
        return;
    }
+   FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Changed"};
    Console.WriteLine($"Changed: {e.FullPath}");
 }
 
