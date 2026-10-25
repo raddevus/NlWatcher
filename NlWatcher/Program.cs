@@ -28,6 +28,7 @@
 
 void OnChanged(object sender, FileSystemEventArgs e)
 {
+if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    if (e.ChangeType != WatcherChangeTypes.Changed)
    {
        return;
@@ -41,6 +42,7 @@ void OnChanged(object sender, FileSystemEventArgs e)
 
 void OnCreated(object sender, FileSystemEventArgs e)
 {
+if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    string value = $"Created: {e.FullPath}";
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Created"};
    FileActivityContext fac = new();
@@ -50,6 +52,7 @@ void OnCreated(object sender, FileSystemEventArgs e)
 }
 
 void OnDeleted(object sender, FileSystemEventArgs e){
+if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Deleted"};
    FileActivityContext fac = new();
    fac.Add(fa);
@@ -59,6 +62,7 @@ void OnDeleted(object sender, FileSystemEventArgs e){
 
 void OnRenamed(object sender, RenamedEventArgs e)
 {
+if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Renamed"};
    FileActivityContext fac = new();
    fac.Add(fa);
