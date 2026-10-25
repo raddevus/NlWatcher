@@ -31,12 +31,12 @@ public class FileActivityContext : DbContext{
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={DbPath}");
     protected String [] allTableCreation = {
-        @"CREATE TABLE ThreadData
+        @"CREATE TABLE FileActivity 
             (
             [ID] INTEGER NOT NULL PRIMARY KEY,
-            [FilePath] NVARCHAR(256) NOT NULL check(length(ThreadId) <= 256),
-            [FileName] NVARCHAR(256) NOT NULL check(length(ThreadId) <= 256),
-            [Action] NVARCHAR(50) NOT NULL check(length(ThreadId) <= 50),
+            [FilePath] NVARCHAR(256) NOT NULL check(length(FilePath) <= 256),
+            [FileName] NVARCHAR(256) NOT NULL check(length(FileName) <= 256),
+            [Action] NVARCHAR(50) NOT NULL check(length(Action) <= 50),
             [Created] NVARCHAR(30) default (datetime('now','localtime')) 
                       check(length(Created) <= 30)
             )"

@@ -33,20 +33,36 @@ void OnChanged(object sender, FileSystemEventArgs e)
        return;
    }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Changed"};
+   FileActivityContext fac = new();
+   fac.Add(fa);
+   fac.SaveChanges();
    Console.WriteLine($"Changed: {e.FullPath}");
 }
 
 void OnCreated(object sender, FileSystemEventArgs e)
 {
    string value = $"Created: {e.FullPath}";
+   FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Created"};
+   FileActivityContext fac = new();
+   fac.Add(fa);
+   fac.SaveChanges();
    Console.WriteLine(value);
 }
 
-void OnDeleted(object sender, FileSystemEventArgs e) =>
-   Console.WriteLine($"Deleted: {e.FullPath}");
+void OnDeleted(object sender, FileSystemEventArgs e){
+   FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Deleted"};
+   FileActivityContext fac = new();
+   fac.Add(fa);
+   fac.SaveChanges();
+   Console.WriteLine($"Deleted: {e.FullPath}"); 
+}
 
 void OnRenamed(object sender, RenamedEventArgs e)
 {
+   FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Renamed"};
+   FileActivityContext fac = new();
+   fac.Add(fa);
+   fac.SaveChanges();
    Console.WriteLine($"Renamed:");
    Console.WriteLine($"    Old: {e.OldFullPath}");
    Console.WriteLine($"    New: {e.FullPath}");
