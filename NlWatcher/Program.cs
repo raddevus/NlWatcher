@@ -63,6 +63,6 @@ void PrintException(Exception? ex)
        Console.WriteLine("Stacktrace:");
        Console.WriteLine(ex.StackTrace);
        Console.WriteLine();
-       PrintException(ex.InnerException);
+       //PrintException(ex.InnerException);
    }
 }
