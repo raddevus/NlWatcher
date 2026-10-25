@@ -3,7 +3,7 @@
    if (args.Length < 1) {Console.WriteLine("Need path."); return;}
    
    using var watcher = new FileSystemWatcher(args[0]);
-
+    watcher.InternalBufferSize = 65536;
    watcher.NotifyFilter = NotifyFilters.Attributes
                         | NotifyFilters.CreationTime
                         | NotifyFilters.DirectoryName
@@ -28,6 +28,8 @@
 
 void OnChanged(object sender, FileSystemEventArgs e)
 {
+  // if e.FullPath represents a directory then we ignore
+  if (Directory.Exists(e.FullPath)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    if (e.ChangeType != WatcherChangeTypes.Changed)
    {
@@ -42,6 +44,8 @@ if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return
 
 void OnCreated(object sender, FileSystemEventArgs e)
 {
+  // if e.FullPath represents a directory then we ignore
+  if (Directory.Exists(e.FullPath)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    string value = $"Created: {e.FullPath}";
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Created"};
@@ -52,6 +56,8 @@ if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return
 }
 
 void OnDeleted(object sender, FileSystemEventArgs e){
+  // if e.FullPath represents a directory then we ignore
+  if (Directory.Exists(e.FullPath)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Deleted"};
    FileActivityContext fac = new();
@@ -62,6 +68,8 @@ if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return
 
 void OnRenamed(object sender, RenamedEventArgs e)
 {
+  // if e.FullPath represents a directory then we ignore
+  if (Directory.Exists(e.FullPath)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Renamed"};
    FileActivityContext fac = new();
@@ -84,5 +92,12 @@ void PrintException(Exception? ex)
        Console.WriteLine(ex.StackTrace);
        Console.WriteLine();
        //PrintException(ex.InnerException);
+        if (ex is InternalBufferOverflowException)
+        {
+          Console.WriteLine("It's buffer overflow");
+        }
+        else{
+          Console.WriteLine(ex.GetType());
+        }
    }
 }
