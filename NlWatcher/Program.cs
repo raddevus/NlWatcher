@@ -1,17 +1,20 @@
 ﻿using NlWatcher.Models;
 
    if (args.Length < 1) {Console.WriteLine("Need path."); return;}
-   
+   Console.WriteLine($"{Environment.CurrentDirectory}");
+   var allExclusionPaths = LoadExcludePaths();
    using var watcher = new FileSystemWatcher(args[0]);
-    watcher.InternalBufferSize = 65536;
-   watcher.NotifyFilter = NotifyFilters.Attributes
-                        | NotifyFilters.CreationTime
-                        | NotifyFilters.DirectoryName
-                        | NotifyFilters.FileName
-                        | NotifyFilters.LastAccess
-                        | NotifyFilters.LastWrite
-                        | NotifyFilters.Security
-                        | NotifyFilters.Size;
+   watcher.InternalBufferSize = 65536;
+
+   // We need the following filters so that all Events
+   // (Created, Deleted, etc.) fire.  But I've discovered
+   // that the NotifyFilters.LastAccess generates way
+   // too much output on Linux systems. Way to many file accesses & overloads this app.
+   watcher.NotifyFilter =
+                        NotifyFilters.LastWrite |
+                        NotifyFilters.Size |
+                        NotifyFilters.FileName |
+                        NotifyFilters.DirectoryName;
 
    watcher.Changed += OnChanged;
    watcher.Created += OnCreated;
@@ -30,6 +33,7 @@ void OnChanged(object sender, FileSystemEventArgs e)
 {
   // if e.FullPath represents a directory then we ignore
   if (Directory.Exists(e.FullPath)) return;
+  if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    if (e.ChangeType != WatcherChangeTypes.Changed)
    {
@@ -46,6 +50,7 @@ void OnCreated(object sender, FileSystemEventArgs e)
 {
   // if e.FullPath represents a directory then we ignore
   if (Directory.Exists(e.FullPath)) return;
+  if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    string value = $"Created: {e.FullPath}";
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Created"};
@@ -58,6 +63,7 @@ if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return
 void OnDeleted(object sender, FileSystemEventArgs e){
   // if e.FullPath represents a directory then we ignore
   if (Directory.Exists(e.FullPath)) return;
+  if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Deleted"};
    FileActivityContext fac = new();
@@ -70,6 +76,7 @@ void OnRenamed(object sender, RenamedEventArgs e)
 {
   // if e.FullPath represents a directory then we ignore
   if (Directory.Exists(e.FullPath)) return;
+  if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains("NlWatcher.db", StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Renamed"};
    FileActivityContext fac = new();
@@ -101,3 +108,22 @@ void PrintException(Exception? ex)
         }
    }
 }
+
+List<string> LoadExcludePaths(){
+   Console.WriteLine("Loading exclusion paths.");
+   if (!File.Exists("excludePaths.txt")){
+      Console.WriteLine("No excludePaths.txt found.");
+      return new List<string>();
+   }
+   return File.ReadAllLines("excludePaths.txt").ToList<string>();
+}
+
+bool IsExclusionPath(string path, List<string> excludePaths){
+   foreach (string p in excludePaths){
+      if (path.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0){
+         return true;
+      }
+   }
+   return false;
+}
+
