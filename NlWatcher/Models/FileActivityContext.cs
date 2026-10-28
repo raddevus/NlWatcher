@@ -21,10 +21,7 @@ public class FileActivityContext : DbContext{
         FileInfo fi = new FileInfo(DbPath);
         // check to see if db file is 0 length, if so, it needs to have table added
         if (fi.Length == 0){
-            foreach (String tableCreate in allTableCreation){
-                command.CommandText = tableCreate;
-                command.ExecuteNonQuery();
-            }
+           EnsureDatabaseInitialized();
         }
     }
     // configures the database for use by EF
@@ -41,4 +38,28 @@ public class FileActivityContext : DbContext{
                       check(length(Created) <= 30)
             )"
     };
+
+    /// <summary>
+    /// Initializes the database, enables WAL mode, and creates custom tables if they don't exist.
+    /// </summary>
+    private void EnsureDatabaseInitialized()
+    {
+        // 1. Ensure the database file is created
+ //       Database.EnsureCreated();
+
+        // 2. Turn on Write-Ahead Logging (WAL) mode
+        Database.ExecuteSqlRaw("PRAGMA journal_mode=WAL;");
+
+        // (Optional performance tweak often paired with WAL mode)
+        // Thought it should be set to FULL but NORMAL is 
+        // fine and shaves off a few milliseconds.
+        // For our purposes this is safe enough (not quite ACID)
+//        Database.ExecuteSqlRaw("PRAGMA synchronous=FULL;");
+
+        // 3. Execute your table creation scripts
+        foreach (var sql in allTableCreation)
+        {
+            Database.ExecuteSqlRaw(sql);
+        }
+    }
 }
