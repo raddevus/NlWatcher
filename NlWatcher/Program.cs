@@ -1,6 +1,18 @@
 ﻿using NlWatcher.Models;
 
+   var excludeFileName = "excludePaths.txt";
+
    if (args.Length < 1) {Console.WriteLine("Please provide a path to watch."); return;}
+   switch (args.Length){
+      // There is no 1 bec one arg uses default values
+      case 2: {
+         
+         break;
+      }
+      case 3:{
+         break;
+      }
+   }
    Console.WriteLine($"{Environment.CurrentDirectory}");
    var allExclusionPaths = LoadExcludePaths();
    using var watcher = new FileSystemWatcher(args[0]);
@@ -111,11 +123,11 @@ void PrintException(Exception? ex)
 
 List<string> LoadExcludePaths(){
    Console.WriteLine("Loading exclusion paths.");
-   if (!File.Exists("excludePaths.txt")){
-      Console.WriteLine("No excludePaths.txt found.");
+   if (!File.Exists(excludeFileName)){
+      Console.WriteLine($"No exclude paths file {excludeFileName} found.");
       return new List<string>();
    }
-   return File.ReadAllLines("excludePaths.txt").ToList<string>();
+   return File.ReadAllLines(excludeFileName).ToList<string>();
 }
 
 bool IsExclusionPath(string path, List<string> excludePaths){
