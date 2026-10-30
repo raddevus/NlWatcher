@@ -1,6 +1,6 @@
 ﻿using NlWatcher.Models;
 
-   if (args.Length < 1) {Console.WriteLine("Need path."); return;}
+   if (args.Length < 1) {Console.WriteLine("Please provide a path to watch."); return;}
    Console.WriteLine($"{Environment.CurrentDirectory}");
    var allExclusionPaths = LoadExcludePaths();
    using var watcher = new FileSystemWatcher(args[0]);
