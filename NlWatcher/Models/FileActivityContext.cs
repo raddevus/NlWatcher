@@ -31,7 +31,7 @@ public class FileActivityContext : DbContext{
         @"CREATE TABLE FileActivity 
             (
             [ID] INTEGER NOT NULL PRIMARY KEY,
-            [FilePath] NVARCHAR(256) NOT NULL check(length(FilePath) <= 256),
+            [FilePath] NVARCHAR(1023) NOT NULL check(length(FilePath) <= 1023),
             [FileName] NVARCHAR(256) NOT NULL check(length(FileName) <= 256),
             [Action] NVARCHAR(50) NOT NULL check(length(Action) <= 50),
             [Created] NVARCHAR(30) default (datetime('now','localtime')) 
