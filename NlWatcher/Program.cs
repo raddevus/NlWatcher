@@ -1,17 +1,23 @@
 ﻿using NlWatcher.Models;
 
    var excludeFileName = "excludePaths.txt";
-   string pathToDb = null;
+   string DbPath = null;
    string DbFileName = "NlWatcher.db";
 
    if (args.Length < 1) {Console.WriteLine("Please provide a path to watch."); return;}
    switch (args.Length){
       // There is no 1 bec one arg uses default values
       case 2: {
-         pathToDb = args[1];
+         // if user only adds the 2nd arg then
+         // it is used as the filename & stored in
+         // the default path
+         DbFileName = args[1];
          break;
       }
       case 3:{
+         if (Directory.Exists(args[2])){
+            DbPath = args[2];
+         }
          break;
       }
    }
@@ -54,7 +60,7 @@ if (e.Name.Contains(DbFileName, StringComparison.OrdinalIgnoreCase)) {return; }
        return;
    }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Changed"};
-   FileActivityContext fac = new();
+   FileActivityContext fac = new(DbPath, DbFileName);
    fac.Add(fa);
    fac.SaveChanges();
    Console.WriteLine($"Changed: {e.FullPath}");
@@ -68,7 +74,7 @@ void OnCreated(object sender, FileSystemEventArgs e)
 if (e.Name.Contains(DbFileName, StringComparison.OrdinalIgnoreCase)) {return; }
    string value = $"Created: {e.FullPath}";
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Created"};
-   FileActivityContext fac = new();
+   FileActivityContext fac = new(DbPath, DbFileName);
    fac.Add(fa);
    fac.SaveChanges();
    Console.WriteLine(value);
@@ -80,7 +86,7 @@ void OnDeleted(object sender, FileSystemEventArgs e){
   if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains(DbFileName, StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Deleted"};
-   FileActivityContext fac = new();
+   FileActivityContext fac = new(DbPath, DbFileName);
    fac.Add(fa);
    fac.SaveChanges();
    Console.WriteLine($"Deleted: {e.FullPath}"); 
@@ -93,7 +99,7 @@ void OnRenamed(object sender, RenamedEventArgs e)
   if (IsExclusionPath(e.FullPath, allExclusionPaths)) return;
 if (e.Name.Contains(DbFileName, StringComparison.OrdinalIgnoreCase)) {return; }
    FileActivity fa = new FileActivity{FilePath=Path.GetDirectoryName(e.FullPath), FileName=Path.GetFileName(e.FullPath), Created=DateTime.Now, Action="Renamed"};
-   FileActivityContext fac = new();
+   FileActivityContext fac = new(DbPath, DbFileName);
    fac.Add(fa);
    fac.SaveChanges();
    Console.WriteLine($"Renamed:");

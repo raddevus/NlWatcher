@@ -8,7 +8,7 @@ public class FileActivityContext : DbContext{
     public DbSet<FileActivity> FileActivity { get; set; }
     public string DbPath{get;set;}
    
-    public FileActivityContext(string path = null, string dbFileName="NlWatcher.db"){
+    public FileActivityContext(string path, string dbFileName){
        var folder = Environment.SpecialFolder.LocalApplicationData;
        if (path == null){
            path = Environment.GetFolderPath(folder);
