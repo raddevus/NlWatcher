@@ -8,10 +8,12 @@ public class FileActivityContext : DbContext{
     public DbSet<FileActivity> FileActivity { get; set; }
     public string DbPath{get;set;}
    
-    public FileActivityContext(){
-      var folder = Environment.SpecialFolder.LocalApplicationData;
-        var path = Environment.GetFolderPath(folder);
-        DbPath = System.IO.Path.Join(path, "NlWatcher.db");
+    public FileActivityContext(string path = null, string dbFileName="NlWatcher.db"){
+       var folder = Environment.SpecialFolder.LocalApplicationData;
+       if (path == null){
+           path = Environment.GetFolderPath(folder);
+       }
+        DbPath = System.IO.Path.Join(path, dbFileName);
         Console.WriteLine(DbPath);
 
         SqliteConnection connection = new SqliteConnection($"Data Source={DbPath}");
